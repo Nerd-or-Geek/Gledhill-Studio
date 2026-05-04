@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Gledhill Metadata
+Exec=gledhill_metadata
+Icon=AppLogo
+Type=Application
+Categories=Utility;
+Terminal=false
