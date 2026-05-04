@@ -8,10 +8,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 if [[ -d "$REPO_ROOT/gledhillmetadata" ]]; then
 	FLUTTER_DIR="$REPO_ROOT/gledhillmetadata"
-elif [[ -d "$REPO_ROOT/gledhillstudio" ]]; then
-	FLUTTER_DIR="$REPO_ROOT/gledhillstudio"
 else
-	echo "Error: Could not find Flutter project folder (expected gledhillmetadata or gledhillstudio under $REPO_ROOT)." >&2
+	echo "Error: Could not find Flutter project folder (expected gledhillmetadata under $REPO_ROOT)." >&2
 	exit 1
 fi
 BUILD_DIR="$FLUTTER_DIR/build/linux/x64/release/bundle"

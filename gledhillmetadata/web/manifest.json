@@ -1,11 +1,11 @@
 {
-    "name": "gledhillstudio",
-    "short_name": "gledhillstudio",
+    "name": "Gledhill Metadata",
+    "short_name": "Gledhill Metadata",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Batch edit photo metadata, apply templates, and rename files locally.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

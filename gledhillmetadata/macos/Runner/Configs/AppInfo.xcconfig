@@ -5,13 +5,13 @@
 // 'flutter create' template.
 
 // The application's name. By default this is also the title of the Flutter window.
-PRODUCT_NAME = gledhillstudio
+PRODUCT_NAME = Gledhill Metadata
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.example.gledhillstudio
+PRODUCT_BUNDLE_IDENTIFIER = com.gledhillmetadata.app
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2026 com.example. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2026 Gledhill Metadata. All rights reserved.
 
 // Universal architecture support (arm64 for Apple Silicon and x86_64 for Intel)
 ARCHS = arm64 x86_64

@@ -9,8 +9,8 @@ import 'features/workflows/presentation/workflow_library_screen.dart';
 import 'state/providers.dart';
 import 'utils/external_links.dart';
 
-class GledhillStudioApp extends ConsumerWidget {
-  const GledhillStudioApp({super.key});
+class GledhillMetadataApp extends ConsumerWidget {
+  const GledhillMetadataApp({super.key});
 
   void _forceDisableDebugOverlays() {
     assert(() {

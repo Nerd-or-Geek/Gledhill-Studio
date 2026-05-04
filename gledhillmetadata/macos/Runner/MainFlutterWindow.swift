@@ -2,8 +2,8 @@ import Cocoa
 import FlutterMacOS
 
 class MainFlutterWindow: NSWindow, NSWindowDelegate {
-  private static let savedFrameKey = "GledhillStudioMainWindowFrame"
-  private static let legacyAutosaveKey = "NSWindow Frame GledhillStudioMainWindow"
+  private static let savedFrameKey = "GledhillMetadataMainWindowFrame"
+  private static let legacyAutosaveKey = "NSWindow Frame GledhillMetadataMainWindow"
   private static let minimumWindowSize = NSSize(width: 760, height: 520)
   private static let preferredWindowSize = NSSize(width: 1200, height: 820)
 

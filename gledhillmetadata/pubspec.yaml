@@ -1,5 +1,5 @@
-name: gledhillstudio
-description: "A new Flutter project."
+name: gledhill_metadata
+description: "Batch edit photo metadata, apply templates, and rename files locally."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -40,7 +40,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  flutter_riverpod: ^2.4.10
+  flutter_riverpod: ^2.6.1
   file_picker: ^11.0.2
   desktop_drop: ^0.7.1
   exif: ^3.3.0

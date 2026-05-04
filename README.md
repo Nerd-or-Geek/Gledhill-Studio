@@ -14,7 +14,7 @@ A cross-platform photo metadata editor for fast batch editing, reusable template
 | Platform | Link |
 |----------|------|
 | Windows  | [Download .exe](https://nerd-or-geek.github.io/Gledhill-Metadata/downloads/Gledhill-Metadata-windows.exe) |
-| macOS Intel + Apple Silicon | [Download .dmg](https://nerd-or-geek.github.io/Gledhill-Metadata/downloads/Gledhill-studio-mac.dmg) |
+| macOS Intel + Apple Silicon | [Download .dmg](https://nerd-or-geek.github.io/Gledhill-Metadata/downloads/Gledhill-Metadata-mac.dmg) |
 | Linux    | [Download AppImage](https://nerd-or-geek.github.io/Gledhill-Metadata/downloads/Gledhill_Metadata-x86_64.AppImage) |
 
 ## Linux Quick Install
