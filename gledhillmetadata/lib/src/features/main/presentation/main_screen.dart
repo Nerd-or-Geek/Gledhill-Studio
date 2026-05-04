@@ -146,16 +146,21 @@ class _MainScreenState extends ConsumerState<MainScreen> {
 
     // Keep callbacks fresh so the HardwareKeyboard handler always dispatches
     // with the latest state.
-    _shortcutCallbacks[PhotoShortcutCommand.selectAll] =
-        _isApplying ? () {} : browserController.selectAllPhotos;
-    _shortcutCallbacks[PhotoShortcutCommand.unselectAll] =
-        _isApplying ? () {} : browserController.clearSelection;
-    _shortcutCallbacks[PhotoShortcutCommand.deleteSelected] =
-        _isApplying ? () {} : browserController.removeSelectedPhotos;
-    _shortcutCallbacks[PhotoShortcutCommand.apply] =
-        _isApplying ? () {} : applySelection;
-    _shortcutCallbacks[PhotoShortcutCommand.pickPhotos] =
-        _isApplying ? () {} : browserController.pickPhotos;
+    _shortcutCallbacks[PhotoShortcutCommand.selectAll] = _isApplying
+        ? () {}
+        : browserController.selectAllPhotos;
+    _shortcutCallbacks[PhotoShortcutCommand.unselectAll] = _isApplying
+        ? () {}
+        : browserController.clearSelection;
+    _shortcutCallbacks[PhotoShortcutCommand.deleteSelected] = _isApplying
+        ? () {}
+        : browserController.removeSelectedPhotos;
+    _shortcutCallbacks[PhotoShortcutCommand.apply] = _isApplying
+        ? () {}
+        : applySelection;
+    _shortcutCallbacks[PhotoShortcutCommand.pickPhotos] = _isApplying
+        ? () {}
+        : browserController.pickPhotos;
 
     return Scaffold(
       body: LayoutBuilder(
@@ -182,128 +187,117 @@ class _MainScreenState extends ConsumerState<MainScreen> {
           final mainContent = Focus(
             autofocus: true,
             child: DropTarget(
-                onDragEntered: (_) => browserController.setDragging(true),
-                onDragExited: (_) => browserController.setDragging(false),
-                onDragDone: (details) {
-                  browserController.setDragging(false);
-                  browserController.addDroppedFiles(
-                    details.files.cast<dynamic>(),
-                  );
-                },
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 180),
-                  padding: browserState.isDragging
-                      ? const EdgeInsets.all(2)
-                      : EdgeInsets.zero,
-                  decoration: browserState.isDragging
-                      ? BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: theme.colorScheme.primary,
-                            width: 2,
-                          ),
-                        )
-                      : null,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      if (hasPhotos)
-                        _PhotoWorkspaceToolbar(
-                          totalCount: browserState.photos.length,
-                          selectedCount: browserState.selectedPhotos.length,
+              onDragEntered: (_) => browserController.setDragging(true),
+              onDragExited: (_) => browserController.setDragging(false),
+              onDragDone: (details) {
+                browserController.setDragging(false);
+                browserController.addDroppedFiles(
+                  details.files.cast<dynamic>(),
+                );
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 180),
+                padding: browserState.isDragging
+                    ? const EdgeInsets.all(2)
+                    : EdgeInsets.zero,
+                decoration: browserState.isDragging
+                    ? BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: theme.colorScheme.primary,
+                          width: 2,
+                        ),
+                      )
+                    : null,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    if (hasPhotos)
+                      _PhotoWorkspaceToolbar(
+                        totalCount: browserState.photos.length,
+                        selectedCount: browserState.selectedPhotos.length,
+                        viewMode: settings.photoViewMode,
+                        gridSize: settings.photoGridSize,
+                        isCompact: isCompact,
+                        onPickPhotos: browserController.pickPhotos,
+                        onSelectAll: browserController.selectAllPhotos,
+                        onClearSelection: browserController.clearSelection,
+                        onRemoveSelected: browserState.selectedPhotos.isEmpty
+                            ? null
+                            : browserController.removeSelectedPhotos,
+                        onViewModeChanged: settingsController.setPhotoViewMode,
+                        onGridSizeChanged: settingsController.setPhotoGridSize,
+                      )
+                    else
+                      Expanded(
+                        child: _EmptyImportPanel(
+                          isDragging: browserState.isDragging,
+                          decoration: panelDecoration,
+                          padding: panelPadding,
+                          onPickPhotos: browserController.pickPhotos,
+                        ),
+                      ),
+                    if (browserState.errorMessage != null) ...[
+                      SizedBox(height: gap),
+                      _ErrorNotice(
+                        message: browserState.errorMessage!,
+                        showFullDetails: settings.showFullErrorDetails,
+                        onDismiss: browserController.clearError,
+                      ),
+                    ],
+                    if (hasPhotos) ...[
+                      SizedBox(height: gap),
+                      _WorkflowBar(
+                        templates: templates,
+                        conventions: conventions,
+                        selectedTemplateId: effectiveTemplateId,
+                        selectedConventionId: effectiveConventionId,
+                        onTemplateSelected: (id) {
+                          setState(() => _selectedTemplateId = id);
+                        },
+                        onConventionSelected: (id) {
+                          setState(() => _selectedConventionId = id);
+                        },
+                      ),
+                      SizedBox(height: gap),
+                      Expanded(
+                        child: _PhotoBrowserArea(
+                          photos: browserState.photos,
                           viewMode: settings.photoViewMode,
                           gridSize: settings.photoGridSize,
-                          isCompact: isCompact,
-                          onPickPhotos: browserController.pickPhotos,
-                          onSelectAll: browserController.selectAllPhotos,
-                          onClearSelection: browserController.clearSelection,
-                          onRemoveSelected: browserState.selectedPhotos.isEmpty
-                              ? null
-                              : browserController.removeSelectedPhotos,
-                          onViewModeChanged:
-                              settingsController.setPhotoViewMode,
-                          onGridSizeChanged:
-                              settingsController.setPhotoGridSize,
-                        )
-                      else
-                        Expanded(
-                          child: _EmptyImportPanel(
-                            isDragging: browserState.isDragging,
-                            decoration: panelDecoration,
-                            padding: panelPadding,
-                            onPickPhotos: browserController.pickPhotos,
-                          ),
-                        ),
-                      if (browserState.errorMessage != null) ...[
-                        SizedBox(height: gap),
-                        MaterialBanner(
-                          content: Text(
-                            settings.showFullErrorDetails
-                                ? browserState.errorMessage!
-                                : 'Something went wrong. Full details are saved in Settings.',
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: browserController.clearError,
-                              child: const Text('Dismiss'),
-                            ),
-                          ],
-                        ),
-                      ],
-                      if (hasPhotos) ...[
-                        SizedBox(height: gap),
-                        _WorkflowBar(
-                          templates: templates,
-                          conventions: conventions,
-                          selectedTemplateId: effectiveTemplateId,
-                          selectedConventionId: effectiveConventionId,
-                          onTemplateSelected: (id) {
-                            setState(() => _selectedTemplateId = id);
-                          },
-                          onConventionSelected: (id) {
-                            setState(() => _selectedConventionId = id);
-                          },
-                        ),
-                        SizedBox(height: gap),
-                        Expanded(
-                          child: _PhotoBrowserArea(
-                            photos: browserState.photos,
-                            viewMode: settings.photoViewMode,
-                            gridSize: settings.photoGridSize,
-                            decoration: panelDecoration,
-                            onFocus: browserController.focusPhoto,
-                            onToggleSelection:
-                                browserController.toggleSelection,
-                          ),
-                        ),
-                        SizedBox(height: gap),
-                        _RenamePreviewPanel(
-                          photos: selectedPhotos,
-                          selectedTemplate: selectedTemplate,
-                          selectedConvention: selectedConvention,
-                          isExpanded: _isRenamePreviewExpanded,
-                          isCompact: isCompact,
                           decoration: panelDecoration,
-                          onToggleExpanded: () {
-                            setState(() {
-                              _isRenamePreviewExpanded =
-                                  !_isRenamePreviewExpanded;
-                            });
-                          },
+                          onFocus: browserController.focusPhoto,
+                          onToggleSelection: browserController.toggleSelection,
                         ),
-                        SizedBox(height: gap),
-                        _ApplyActionBar(
-                          canApply: canApply,
-                          isApplying: _isApplying,
-                          progress: _applyProgress,
-                          currentFile: _applyCurrentFile,
-                          selectedCount: selectedPhotos.length,
-                          onApply: applySelection,
-                        ),
-                      ],
+                      ),
+                      SizedBox(height: gap),
+                      _RenamePreviewPanel(
+                        photos: selectedPhotos,
+                        selectedTemplate: selectedTemplate,
+                        selectedConvention: selectedConvention,
+                        isExpanded: _isRenamePreviewExpanded,
+                        isCompact: isCompact,
+                        decoration: panelDecoration,
+                        onToggleExpanded: () {
+                          setState(() {
+                            _isRenamePreviewExpanded =
+                                !_isRenamePreviewExpanded;
+                          });
+                        },
+                      ),
+                      SizedBox(height: gap),
+                      _ApplyActionBar(
+                        canApply: canApply,
+                        isApplying: _isApplying,
+                        progress: _applyProgress,
+                        currentFile: _applyCurrentFile,
+                        selectedCount: selectedPhotos.length,
+                        onApply: applySelection,
+                      ),
                     ],
-                  ),
+                  ],
                 ),
+              ),
             ),
           );
 
@@ -422,7 +416,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
           content: Text(
             showFullErrors
                 ? 'Completed with ${result.errors.length} warning(s).'
-                : 'Completed with ${result.errors.length} warning(s). Full details are saved in Settings.',
+                : 'Completed with warning(s). Details are saved in Settings.',
           ),
           action: showFullErrors
               ? SnackBarAction(
@@ -430,7 +424,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                   onPressed: () => _showApplyWarningsDialog(result.errors),
                 )
               : null,
-          duration: const Duration(seconds: 6),
+          duration: Duration(seconds: showFullErrors ? 6 : 4),
         ),
       );
 
@@ -761,6 +755,70 @@ class _EmptyImportPanel extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ErrorNotice extends StatelessWidget {
+  const _ErrorNotice({
+    required this.message,
+    required this.showFullDetails,
+    required this.onDismiss,
+  });
+
+  final String message;
+  final bool showFullDetails;
+  final VoidCallback onDismiss;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    if (showFullDetails) {
+      return MaterialBanner(
+        content: Text(message),
+        leading: const Icon(Icons.error_outline),
+        actions: [
+          TextButton(onPressed: onDismiss, child: const Text('Dismiss')),
+        ],
+      );
+    }
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: theme.colorScheme.errorContainer.withValues(alpha: 0.32),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: theme.colorScheme.error.withValues(alpha: 0.28),
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: Row(
+          children: [
+            Icon(Icons.error_outline, size: 18, color: theme.colorScheme.error),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Something needs attention. Full details are saved in Settings.',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onErrorContainer,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: onDismiss,
+              style: TextButton.styleFrom(
+                visualDensity: VisualDensity.compact,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              child: const Text('Dismiss'),
+            ),
+          ],
         ),
       ),
     );

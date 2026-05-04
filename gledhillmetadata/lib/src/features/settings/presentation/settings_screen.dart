@@ -219,7 +219,7 @@ class SettingsScreen extends ConsumerWidget {
                           onChanged: controller.setShowFullErrorDetails,
                           title: const Text('Show full errors immediately'),
                           subtitle: const Text(
-                            'Off shows simpler messages and saves details here.',
+                            'Default off. Quietly flags errors and saves details here.',
                           ),
                         ),
                         const SizedBox(height: 8),
