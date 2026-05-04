@@ -5,6 +5,10 @@ set -euo pipefail
 APP_NAME="Gledhill Metadata"
 APP_ID="gledhill_metadata"
 ARCH="$(uname -m)"
+ARCH_ALT="$ARCH"
+if [[ "$ARCH" == "amd64" ]]; then
+	ARCH_ALT="x86_64"
+fi
 DOWNLOAD_BASE="${DOWNLOAD_BASE:-https://nerd-or-geek.github.io/Gledhill-Metadata/downloads}"
 RAW_BASE="${RAW_BASE:-https://raw.githubusercontent.com/Nerd-or-Geek/Gledhill-Metadata/main}"
 
@@ -44,8 +48,12 @@ trap 'rm -f "$TMP_APPIMAGE"' EXIT
 
 echo "Downloading AppImage..."
 APPIMAGE_URLS=(
+	"$DOWNLOAD_BASE/Gledhill_Metadata-${ARCH}.AppImage"
+	"$DOWNLOAD_BASE/Gledhill_Metadata-${ARCH_ALT}.AppImage"
 	"$DOWNLOAD_BASE/${APP_ID}-${ARCH}.AppImage"
+	"$DOWNLOAD_BASE/${APP_ID}-${ARCH_ALT}.AppImage"
 	"$DOWNLOAD_BASE/Gledhill-Metadata-${ARCH}.AppImage"
+	"$DOWNLOAD_BASE/Gledhill-Metadata-${ARCH_ALT}.AppImage"
 )
 
 DOWNLOAD_OK="false"

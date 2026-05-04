@@ -232,6 +232,18 @@ p {
   animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.3s backwards;
 }
 
+.download-platform-actions .btn {
+  padding: 0.8rem 1.4rem;
+  min-width: 200px;
+  gap: 0.5rem;
+  font-size: 1rem;
+}
+
+.download-platform-actions .btn-icon {
+  width: 18px;
+  height: 18px;
+}
+
 .linux-install-box {
   margin-top: 1.2rem;
   padding: 1.1rem;
