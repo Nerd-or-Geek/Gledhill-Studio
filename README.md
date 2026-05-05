@@ -63,18 +63,17 @@ Current release: **v1.8.0**
 
 ## 💰 Support & Commercial Use
 
-Gledhill Metadata is **free for individuals** and open source under the MIT License. Businesses are encouraged to support ongoing development.
+Gledhill Metadata is **free for individuals** and open source under the MIT License. Organizations and businesses are encouraged to support ongoing development.
 
 - **Use it free** — Individuals, students, and nonprofits have unlimited free use
-- **Businesses support development** — Commercial users are encouraged to contribute
+- **Organizations support development** — Commercial users are encouraged to contribute based on usage scale
 - **Honor-based** — No enforcement, no tracking, completely voluntary
 
-See [COMMERCIAL_USE.md](COMMERCIAL_USE.md) for pricing tiers and support options.
+See [COMMERCIAL_USE.md](COMMERCIAL_USE.md) for recommended tiers and support options.
 
 ### Support This Project
 
 - 💙 [GitHub Sponsors](https://github.com/sponsors/Nerd-or-Geek)
-- ☕ [Buy Me a Coffee](https://buymeacoffee.com/gledhill-metadata)
 
 ## License
 
