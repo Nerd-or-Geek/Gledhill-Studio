@@ -1,5 +1,7 @@
 # Gledhill Metadata
 
+**Free for individuals • Supported by businesses**
+
 ### [🌐 Visit the Website → nerd-or-geek.github.io/Gledhill-Metadata](https://nerd-or-geek.github.io/Gledhill-Metadata/)
 
 ### [📘 Open the User Guide → nerd-or-geek.github.io/Gledhill-Metadata/user-guide.html](https://nerd-or-geek.github.io/Gledhill-Metadata/user-guide.html)
@@ -59,6 +61,23 @@ The Linux helper scripts now live in [linux](linux).
 
 Current release: **v1.8.0**
 
+## 💰 Support & Commercial Use
+
+Gledhill Metadata is **free for individuals** and open source under the MIT License. Businesses are encouraged to support ongoing development.
+
+- **Use it free** — Individuals, students, and nonprofits have unlimited free use
+- **Businesses support development** — Commercial users are encouraged to contribute
+- **Honor-based** — No enforcement, no tracking, completely voluntary
+
+See [COMMERCIAL_USE.md](COMMERCIAL_USE.md) for pricing tiers and support options.
+
+### Support This Project
+
+- 💙 [GitHub Sponsors](https://github.com/sponsors/Nerd-or-Geek)
+- ☕ [Buy Me a Coffee](https://buymeacoffee.com/gledhill-metadata)
+
 ## License
 
-© Gledhill Metadata
+© 2026 Michael Gledhill
+
+Licensed under the MIT License — see [LICENSE](LICENSE) file for details.
