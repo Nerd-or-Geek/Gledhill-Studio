@@ -17,6 +17,7 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
+AppUserModelID=com.nerdorgeek.gledhillmetadata
 DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 UninstallDisplayIcon={app}\{#MyAppExeName}
@@ -28,7 +29,7 @@ PrivilegesRequiredOverridesAllowed=dialog
 ; Export directly to your GitHub Pages downloads folder.
 OutputDir={#WebsiteDownloadsDir}
 OutputBaseFilename={#WebsiteWindowsInstallerName}
-SetupIconFile=assets\icons\app_logo.ico
+SetupIconFile=windows\runner\resources\app_icon.ico
 Compression=lzma2
 SolidCompression=yes
 WizardStyle=modern
@@ -38,14 +39,16 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
+Name: "refreshiconcache"; Description: "Refresh Windows icon cache (recommended if search icon appears stale)"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
 ; Package the entire Flutter Windows release bundle.
 Source: "build\windows\x64\runner\Release\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
-Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
+Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\{#MyAppExeName}"; AppUserModelID: "com.nerdorgeek.gledhillmetadata"
+Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\{#MyAppExeName}"; AppUserModelID: "com.nerdorgeek.gledhillmetadata"; Tasks: desktopicon
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+Filename: "{cmd}"; Parameters: "/C ie4uinit.exe -ClearIconCache"; Flags: runhidden postinstall skipifsilent; Tasks: refreshiconcache

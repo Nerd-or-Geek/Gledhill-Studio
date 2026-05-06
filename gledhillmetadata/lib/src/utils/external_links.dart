@@ -7,6 +7,7 @@ const documentationUrl =
     'https://nerd-or-geek.github.io/Gledhill-Metadata/docs.html';
 const updatesUrl = 'https://nerd-or-geek.github.io/Gledhill-Metadata/#updates';
 const issuesUrl = 'https://github.com/Nerd-or-Geek/Gledhill-Metadata/issues';
+const githubSponsorsUrl = 'https://github.com/sponsors/Nerd-or-Geek';
 
 Future<void> openExternalUrl(BuildContext context, String url) async {
   final command = Platform.isMacOS

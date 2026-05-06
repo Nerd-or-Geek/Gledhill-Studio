@@ -110,6 +110,7 @@ class BatchApplyService {
       final effectiveMetadata = _metadataAfterTemplate(
         originalMetadata: photo.fullMetadata,
         templateFields: template.fields,
+        mergeStrategy: mergeStrategy,
       );
       final ext = p.extension(photo.fileName);
       final title =
@@ -231,8 +232,11 @@ class BatchApplyService {
   Map<String, String> _metadataAfterTemplate({
     required Map<String, String> originalMetadata,
     required Map<String, String> templateFields,
+    required MetadataMergeStrategy mergeStrategy,
   }) {
-    final output = <String, String>{...originalMetadata};
+    final output = mergeStrategy == MetadataMergeStrategy.replaceAll
+        ? <String, String>{}
+        : <String, String>{...originalMetadata};
 
     for (final entry in templateFields.entries) {
       final value = entry.value.trim();

@@ -263,6 +263,7 @@ class ExifToolService {
       }
     }
 
+    final tagAssignments = <String, String>{};
     for (final entry in templateFields.entries) {
       final value = entry.value.trim();
       if (value.isEmpty) {
@@ -271,36 +272,46 @@ class ExifToolService {
 
       final tags = _tagMapper.tagsForField(entry.key).toSet().toList(growable: false);
       for (final tag in tags) {
-        if (_tagMapper.isListTag(tag)) {
-          final values = value
-              .split(',')
-              .map((token) => token.trim())
-              .where((token) => token.isNotEmpty)
-              .toList(growable: false);
+        tagAssignments[tag] = value;
+      }
+    }
 
-          if (values.isEmpty) {
-            continue;
-          }
+    for (final entry in tagAssignments.entries) {
+      final tag = entry.key;
+      final value = entry.value;
+      if (_tagMapper.isListTag(tag)) {
+        final values = value
+            .split(',')
+            .map((token) => token.trim())
+            .where((token) => token.isNotEmpty)
+            .toList(growable: false);
 
-          final listArgs = <String>['-overwrite_original_in_place', '-$tag='];
-          for (final item in values) {
-            listArgs.add('-$tag+=$item');
-          }
-          listArgs.add(filePath);
+        if (values.isEmpty) {
+          continue;
+        }
 
-          final result = await run(listArgs);
-          if (result.exitCode == 0) {
-            successfulTagWrites++;
-          } else {
-            warnings.add('Failed writing $tag for $filePath: ${result.stderr}');
-          }
+        final listArgs = <String>['-overwrite_original_in_place', '-$tag='];
+        for (final item in values) {
+          listArgs.add('-$tag+=$item');
+        }
+        listArgs.add(filePath);
+
+        final result = await run(listArgs);
+        if (result.exitCode == 0) {
+          successfulTagWrites++;
         } else {
-          final result = await run(['-overwrite_original_in_place', '-$tag=$value', filePath]);
-          if (result.exitCode == 0) {
-            successfulTagWrites++;
-          } else {
-            warnings.add('Failed writing $tag for $filePath: ${result.stderr}');
-          }
+          warnings.add('Failed writing $tag for $filePath: ${result.stderr}');
+        }
+      } else {
+        final result = await run([
+          '-overwrite_original_in_place',
+          '-$tag=$value',
+          filePath,
+        ]);
+        if (result.exitCode == 0) {
+          successfulTagWrites++;
+        } else {
+          warnings.add('Failed writing $tag for $filePath: ${result.stderr}');
         }
       }
     }
@@ -312,7 +323,7 @@ class ExifToolService {
     final clearArgs = [
       '-overwrite_original_in_place',
       '-all=',
-      '--icc_profile:all',
+      '-icc_profile:all=',
       '-xmp:all=',
       '-iptc:all=',
       '-exif:all=',
@@ -328,31 +339,24 @@ class ExifToolService {
     }
 
     try {
-      final remaining = await readMetadata(filePath);
-      const requiredClearedGroups = {
-        'xmp',
-        'iptc',
-        'exif',
-      };
-
-      final nonSystemTags = remaining.keys.where((key) {
+      final remaining = await _readEmbeddedMetadata(filePath);
+      final embeddedTags = remaining.keys.where((key) {
         final group = _metadataGroupName(key);
         if (group == null) {
           return false;
         }
 
-        // Only fail if editable descriptive metadata still contains tags.
-        // Color-management data like ICC profiles is preserved intentionally by
-        // the clear command so PNG/JPEG previews keep their intended appearance.
-        return requiredClearedGroups.contains(group);
+        // Ignore synthetic/read-only groups that are computed by ExifTool and
+        // are not embedded metadata chunks in the file.
+        return !_syntheticReadGroups.contains(group);
       }).toList(growable: false);
 
-      if (nonSystemTags.isNotEmpty) {
-        final first = nonSystemTags.first;
+      if (embeddedTags.isNotEmpty) {
+        final first = embeddedTags.first;
         return _MetadataClearResult(
           didClear: false,
           message:
-              'Metadata clear verification failed for $filePath. Still present: $first (${nonSystemTags.length} tag(s) remain).',
+              'Metadata clear verification failed for $filePath. Still present: $first (${embeddedTags.length} tag(s) remain).',
         );
       }
     } catch (error) {
@@ -363,6 +367,38 @@ class ExifToolService {
     }
 
     return const _MetadataClearResult(didClear: true, message: '');
+  }
+
+  Future<Map<String, String>> _readEmbeddedMetadata(String filePath) async {
+    final result = await run([
+      '-j',
+      '-G1',
+      '-a',
+      '-s',
+      '-ee',
+      '-api',
+      'RequestAll=3',
+      '-all:all',
+      filePath,
+    ]);
+    if (result.exitCode != 0) {
+      throw StateError('ExifTool embedded metadata read failed: ${result.stderr}');
+    }
+
+    final decoded = jsonDecode(result.stdout as String) as List<dynamic>;
+    if (decoded.isEmpty) {
+      return const {};
+    }
+
+    final first = decoded.first as Map<String, dynamic>;
+    final metadata = <String, String>{};
+    for (final entry in first.entries) {
+      if (entry.key == 'SourceFile') {
+        continue;
+      }
+      metadata[_normalizeGroupKey(entry.key)] = '${entry.value}';
+    }
+    return metadata;
   }
 
   String? _metadataGroupName(String key) {
@@ -397,6 +433,13 @@ class ExifToolService {
     }
     return key;
   }
+
+  static const Set<String> _syntheticReadGroups = {
+    'composite',
+    'exiftool',
+    'file',
+    'system',
+  };
 
   bool _looksLikePlaceholderBinary(List<int> bytes) {
     if (bytes.isEmpty) {

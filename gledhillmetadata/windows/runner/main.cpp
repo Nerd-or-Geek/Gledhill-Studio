@@ -5,6 +5,22 @@
 #include "flutter_window.h"
 #include "utils.h"
 
+namespace {
+void SetAppUserModelIdIfAvailable() {
+  using SetAppUserModelIdFn = HRESULT(WINAPI*)(PCWSTR);
+  const auto shell32 = ::GetModuleHandleW(L"shell32.dll");
+  if (shell32 == nullptr) {
+    return;
+  }
+
+  const auto set_app_id = reinterpret_cast<SetAppUserModelIdFn>(
+      ::GetProcAddress(shell32, "SetCurrentProcessExplicitAppUserModelID"));
+  if (set_app_id != nullptr) {
+    set_app_id(L"com.nerdorgeek.gledhillmetadata");
+  }
+}
+}  // namespace
+
 int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
                       _In_ wchar_t *command_line, _In_ int show_command) {
   // Attach to console when present (e.g., 'flutter run') or create a
@@ -16,6 +32,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
   // Initialize COM, so that it is available for use in the library and/or
   // plugins.
   ::CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
+
+  // Ensure Windows taskbar/search associates shortcuts and process windows with
+  // the same app identity (and therefore the correct icon).
+  SetAppUserModelIdIfAvailable();
 
   flutter::DartProject project(L"data");
 

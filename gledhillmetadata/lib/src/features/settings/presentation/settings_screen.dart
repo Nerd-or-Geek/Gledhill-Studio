@@ -355,6 +355,28 @@ class SettingsScreen extends ConsumerWidget {
                   SizedBox(
                     width: cardWidth,
                     child: _SettingsCard(
+                      title: 'Support Development',
+                      icon: Icons.volunteer_activism_outlined,
+                      children: [
+                        const Text(
+                          'Support ongoing development of this app. Individuals and businesses can contribute to help improve features and performance.',
+                        ),
+                        const SizedBox(height: 12),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: OutlinedButton.icon(
+                            onPressed: () =>
+                                openExternalUrl(context, githubSponsorsUrl),
+                            icon: const Icon(Icons.favorite_border),
+                            label: const Text('Sponsor on GitHub'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    width: cardWidth,
+                    child: _SettingsCard(
                       title: 'Support',
                       icon: Icons.support_agent_outlined,
                       children: [
