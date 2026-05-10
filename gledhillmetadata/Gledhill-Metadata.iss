@@ -2,7 +2,7 @@
 ; Build the app first with: flutter build windows --release
 
 #define MyAppName "Gledhill Metadata"
-#define MyAppVersion "1.8.0"
+#define MyAppVersion "2.0.0"
 #define MyAppPublisher "Gledhill Metadata"
 #define MyAppURL "https://nerd-or-geek.github.io/Gledhill-Metadata"
 #define MyAppExeName "GledhillMetadata.exe"

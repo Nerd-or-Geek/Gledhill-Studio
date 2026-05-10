@@ -12,7 +12,7 @@ import '../application/app_settings_controller.dart';
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
-  static const _appVersion = '1.8.0';
+  static const _appVersion = '2.0';
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -48,6 +48,283 @@ class SettingsScreen extends ConsumerWidget {
       });
     }
 
+    final workflowAndAppearanceCard = _SettingsCard(
+      title: 'Workflow & Appearance',
+      icon: Icons.tune_outlined,
+      children: [
+        DropdownButtonFormField<String>(
+          key: ValueKey(
+            'default-template-${resolvedDefaultTemplateId ?? ''}',
+          ),
+          initialValue: resolvedDefaultTemplateId ?? '',
+          isExpanded: true,
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+            labelText: 'Default template',
+          ),
+          items: [
+            const DropdownMenuItem<String>(
+              value: '',
+              child: Text('None'),
+            ),
+            ...templates.map(
+              (template) => DropdownMenuItem<String>(
+                value: template.id,
+                child: Text(
+                  template.isFavorite ? '★ ${template.name}' : template.name,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
+          ],
+          onChanged: (value) => controller.setDefaultTemplateId(value),
+        ),
+        const SizedBox(height: 12),
+        DropdownButtonFormField<String>(
+          key: ValueKey(
+            'default-convention-${resolvedDefaultConventionId ?? ''}',
+          ),
+          initialValue: resolvedDefaultConventionId ?? '',
+          isExpanded: true,
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+            labelText: 'Default naming convention',
+          ),
+          items: [
+            const DropdownMenuItem<String>(
+              value: '',
+              child: Text('None'),
+            ),
+            ...conventions.map(
+              (convention) => DropdownMenuItem<String>(
+                value: convention.id,
+                child: Text(
+                  convention.isFavorite ? '★ ${convention.name}' : convention.name,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
+          ],
+          onChanged: (value) => controller.setDefaultConventionId(value),
+        ),
+        const SizedBox(height: 12),
+        DropdownButtonFormField<MetadataMergeStrategy>(
+          key: ValueKey(
+            'merge-strategy-${state.mergeStrategy.name}',
+          ),
+          initialValue: state.mergeStrategy,
+          isExpanded: true,
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+            labelText: 'Metadata write mode',
+          ),
+          items: const [
+            DropdownMenuItem(
+              value: MetadataMergeStrategy.replaceAll,
+              child: Text('Replace all metadata'),
+            ),
+            DropdownMenuItem(
+              value: MetadataMergeStrategy.mergeOverwrite,
+              child: Text('Merge & overwrite'),
+            ),
+          ],
+          onChanged: (value) {
+            if (value != null) {
+              controller.setMergeStrategy(value);
+            }
+          },
+        ),
+        const SizedBox(height: 16),
+        DropdownButtonFormField<AppThemePreset>(
+          key: ValueKey('theme-preset-${state.themePreset.name}'),
+          initialValue: state.themePreset,
+          isExpanded: true,
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+            labelText: 'Theme preset',
+          ),
+          items: const [
+            DropdownMenuItem(
+              value: AppThemePreset.system,
+              child: Text('System theme'),
+            ),
+            DropdownMenuItem(
+              value: AppThemePreset.light,
+              child: Text('Light theme'),
+            ),
+            DropdownMenuItem(
+              value: AppThemePreset.dark,
+              child: Text('Dark theme'),
+            ),
+            DropdownMenuItem(
+              value: AppThemePreset.navyBlue,
+              child: Text('Navy blue theme'),
+            ),
+            DropdownMenuItem(
+              value: AppThemePreset.charcoalGray,
+              child: Text('Charcoal gray theme'),
+            ),
+          ],
+          onChanged: (value) {
+            if (value != null) {
+              controller.setThemePreset(value);
+            }
+          },
+        ),
+      ],
+    );
+
+    final safetyCard = _SettingsCard(
+      title: 'Safety & errors',
+      icon: Icons.health_and_safety_outlined,
+      children: [
+        SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          value: state.showApplyConfirmation,
+          onChanged: controller.setShowApplyConfirmation,
+          title: const Text('Show Apply confirmation'),
+          subtitle: const Text(
+            'Warn before changing files, names, and metadata.',
+          ),
+        ),
+        SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          value: state.showFullErrorDetails,
+          onChanged: controller.setShowFullErrorDetails,
+          title: const Text('Show full errors immediately'),
+          subtitle: const Text(
+            'Default off. Quietly flags errors and saves details here.',
+          ),
+        ),
+        const SizedBox(height: 8),
+        ExpansionTile(
+          tilePadding: EdgeInsets.zero,
+          childrenPadding: EdgeInsets.zero,
+          title: Text('Last ${state.errorLog.length} error(s)'),
+          subtitle: const Text('The app keeps the last 20.'),
+          children: [
+            if (state.errorLog.isEmpty)
+              const ListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text('No errors logged yet.'),
+              )
+            else
+              SizedBox(
+                height: 220,
+                child: Scrollbar(
+                  thumbVisibility: state.errorLog.length > 4,
+                  child: ListView.separated(
+                    itemCount: state.errorLog.length,
+                    separatorBuilder: (context, index) => const Divider(height: 1),
+                    itemBuilder: (context, index) => ListTile(
+                      dense: true,
+                      contentPadding: EdgeInsets.zero,
+                      title: SelectableText(state.errorLog[index]),
+                    ),
+                  ),
+                ),
+              ),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                OutlinedButton.icon(
+                  onPressed: state.errorLog.isEmpty
+                      ? null
+                      : () => _copyErrorLog(context, state),
+                  icon: const Icon(Icons.copy_all_outlined),
+                  label: const Text('Copy Error Log'),
+                ),
+                OutlinedButton.icon(
+                  onPressed: state.errorLog.isEmpty ? null : controller.clearErrorLog,
+                  icon: const Icon(Icons.clear_all_outlined),
+                  label: const Text('Clear Log'),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ],
+    );
+
+    final keyboardShortcutsCard = _SettingsCard(
+      title: 'Keyboard shortcuts',
+      icon: Icons.keyboard_outlined,
+      children: [
+        for (final command in PhotoShortcutCommand.values)
+          _ShortcutRow(
+            command: command,
+            binding: state.keyboardShortcuts[command] ??
+                KeyboardShortcutBinding.defaultFor(command),
+            onChange: () => _editShortcut(context, controller, command),
+          ),
+        const SizedBox(height: 8),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: OutlinedButton.icon(
+            onPressed: controller.resetKeyboardShortcuts,
+            icon: const Icon(Icons.restore_outlined),
+            label: const Text('Reset Defaults'),
+          ),
+        ),
+      ],
+    );
+
+    final supportCombinedCard = _SettingsCard(
+      title: 'Support',
+      icon: Icons.support_agent_outlined,
+      children: [
+        const ListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text('Gledhill Metadata'),
+          subtitle: Text('Version $_appVersion'),
+        ),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            OutlinedButton.icon(
+              onPressed: () => openExternalUrl(context, updatesUrl),
+              icon: const Icon(Icons.system_update_alt_outlined),
+              label: const Text('Check for Updates'),
+            ),
+            OutlinedButton.icon(
+              onPressed: () => _copyBugReportDetails(
+                context: context,
+                settings: state,
+                templateCount: templates.length,
+                conventionCount: conventions.length,
+                catalogError: catalog.errorMessage,
+                photoBrowserError: photoBrowser.errorMessage,
+                templateLibraryError: templateLibrary.errorMessage,
+                renameLibraryError: renameLibrary.errorMessage,
+              ),
+              icon: const Icon(Icons.bug_report_outlined),
+              label: const Text('Copy Bug Details'),
+            ),
+            OutlinedButton.icon(
+              onPressed: () => openExternalUrl(context, issuesUrl),
+              icon: const Icon(Icons.open_in_new),
+              label: const Text('Report Issue'),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        const Text(
+          'Support ongoing development of this app. Individuals and businesses can contribute to help improve features and performance.',
+        ),
+        const SizedBox(height: 12),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: OutlinedButton.icon(
+            onPressed: () => openExternalUrl(context, githubSponsorsUrl),
+            icon: const Icon(Icons.favorite_border),
+            label: const Text('Sponsor on GitHub'),
+          ),
+        ),
+      ],
+    );
+
     return Scaffold(
       body: LayoutBuilder(
         builder: (context, constraints) {
@@ -59,372 +336,35 @@ class SettingsScreen extends ConsumerWidget {
           return ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              Wrap(
-                spacing: 16,
-                runSpacing: 16,
-                children: [
-                  SizedBox(
-                    width: cardWidth,
-                    child: _SettingsCard(
-                      title: 'Workflow defaults',
-                      icon: Icons.tune_outlined,
-                      children: [
-                        DropdownButtonFormField<String>(
-                          key: ValueKey(
-                            'default-template-${resolvedDefaultTemplateId ?? ''}',
-                          ),
-                          initialValue: resolvedDefaultTemplateId ?? '',
-                          isExpanded: true,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'Default template',
-                          ),
-                          items: [
-                            const DropdownMenuItem<String>(
-                              value: '',
-                              child: Text('None'),
-                            ),
-                            ...templates.map(
-                              (template) => DropdownMenuItem<String>(
-                                value: template.id,
-                                child: Text(
-                                  template.isFavorite
-                                      ? '★ ${template.name}'
-                                      : template.name,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ),
-                          ],
-                          onChanged: (value) =>
-                              controller.setDefaultTemplateId(value),
-                        ),
-                        const SizedBox(height: 12),
-                        DropdownButtonFormField<String>(
-                          key: ValueKey(
-                            'default-convention-${resolvedDefaultConventionId ?? ''}',
-                          ),
-                          initialValue: resolvedDefaultConventionId ?? '',
-                          isExpanded: true,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'Default naming convention',
-                          ),
-                          items: [
-                            const DropdownMenuItem<String>(
-                              value: '',
-                              child: Text('None'),
-                            ),
-                            ...conventions.map(
-                              (convention) => DropdownMenuItem<String>(
-                                value: convention.id,
-                                child: Text(
-                                  convention.isFavorite
-                                      ? '★ ${convention.name}'
-                                      : convention.name,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ),
-                          ],
-                          onChanged: (value) =>
-                              controller.setDefaultConventionId(value),
-                        ),
-                        const SizedBox(height: 12),
-                        DropdownButtonFormField<MetadataMergeStrategy>(
-                          key: ValueKey(
-                            'merge-strategy-${state.mergeStrategy.name}',
-                          ),
-                          initialValue: state.mergeStrategy,
-                          isExpanded: true,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'Metadata write mode',
-                          ),
-                          items: const [
-                            DropdownMenuItem(
-                              value: MetadataMergeStrategy.replaceAll,
-                              child: Text('Replace all metadata'),
-                            ),
-                            DropdownMenuItem(
-                              value: MetadataMergeStrategy.mergeOverwrite,
-                              child: Text('Merge & overwrite'),
-                            ),
-                          ],
-                          onChanged: (value) {
-                            if (value != null) {
-                              controller.setMergeStrategy(value);
-                            }
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    width: cardWidth,
-                    child: _SettingsCard(
-                      title: 'Photo browser',
-                      icon: Icons.photo_library_outlined,
-                      children: [
-                        SegmentedButton<PhotoViewMode>(
-                          segments: const [
-                            ButtonSegment<PhotoViewMode>(
-                              value: PhotoViewMode.list,
-                              icon: Icon(Icons.view_list_outlined),
-                              label: Text('List'),
-                            ),
-                            ButtonSegment<PhotoViewMode>(
-                              value: PhotoViewMode.grid,
-                              icon: Icon(Icons.grid_view_outlined),
-                              label: Text('Grid'),
-                            ),
-                          ],
-                          selected: {state.photoViewMode},
-                          onSelectionChanged: (selection) =>
-                              controller.setPhotoViewMode(selection.first),
-                        ),
-                        const SizedBox(height: 14),
-                        Text(
-                          'Grid thumbnail size: ${_gridSizeLabel(state.photoGridSize)}',
-                        ),
-                        Slider(
-                          value: state.photoGridSize,
-                          min: 140,
-                          max: 360,
-                          divisions: 4,
-                          label: _gridSizeLabel(state.photoGridSize),
-                          onChanged: controller.setPhotoGridSize,
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    width: cardWidth,
-                    child: _SettingsCard(
-                      title: 'Safety & errors',
-                      icon: Icons.health_and_safety_outlined,
-                      children: [
-                        SwitchListTile(
-                          contentPadding: EdgeInsets.zero,
-                          value: state.showApplyConfirmation,
-                          onChanged: controller.setShowApplyConfirmation,
-                          title: const Text('Show Apply confirmation'),
-                          subtitle: const Text(
-                            'Warn before changing files, names, and metadata.',
-                          ),
-                        ),
-                        SwitchListTile(
-                          contentPadding: EdgeInsets.zero,
-                          value: state.showFullErrorDetails,
-                          onChanged: controller.setShowFullErrorDetails,
-                          title: const Text('Show full errors immediately'),
-                          subtitle: const Text(
-                            'Default off. Quietly flags errors and saves details here.',
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        ExpansionTile(
-                          tilePadding: EdgeInsets.zero,
-                          childrenPadding: EdgeInsets.zero,
-                          title: Text('Last ${state.errorLog.length} error(s)'),
-                          subtitle: const Text('The app keeps the last 20.'),
-                          children: [
-                            if (state.errorLog.isEmpty)
-                              const ListTile(
-                                contentPadding: EdgeInsets.zero,
-                                title: Text('No errors logged yet.'),
-                              )
-                            else
-                              SizedBox(
-                                height: 220,
-                                child: Scrollbar(
-                                  thumbVisibility: state.errorLog.length > 4,
-                                  child: ListView.separated(
-                                    itemCount: state.errorLog.length,
-                                    separatorBuilder: (context, index) =>
-                                        const Divider(height: 1),
-                                    itemBuilder: (context, index) => ListTile(
-                                      dense: true,
-                                      contentPadding: EdgeInsets.zero,
-                                      title: SelectableText(
-                                        state.errorLog[index],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
-                              children: [
-                                OutlinedButton.icon(
-                                  onPressed: state.errorLog.isEmpty
-                                      ? null
-                                      : () => _copyErrorLog(context, state),
-                                  icon: const Icon(Icons.copy_all_outlined),
-                                  label: const Text('Copy Error Log'),
-                                ),
-                                OutlinedButton.icon(
-                                  onPressed: state.errorLog.isEmpty
-                                      ? null
-                                      : controller.clearErrorLog,
-                                  icon: const Icon(Icons.clear_all_outlined),
-                                  label: const Text('Clear Log'),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    width: cardWidth,
-                    child: _SettingsCard(
-                      title: 'Keyboard shortcuts',
-                      icon: Icons.keyboard_outlined,
-                      children: [
-                        for (final command in PhotoShortcutCommand.values)
-                          _ShortcutRow(
-                            command: command,
-                            binding:
-                                state.keyboardShortcuts[command] ??
-                                KeyboardShortcutBinding.defaultFor(command),
-                            onChange: () =>
-                                _editShortcut(context, controller, command),
-                          ),
-                        const SizedBox(height: 8),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: OutlinedButton.icon(
-                            onPressed: controller.resetKeyboardShortcuts,
-                            icon: const Icon(Icons.restore_outlined),
-                            label: const Text('Reset Defaults'),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    width: cardWidth,
-                    child: _SettingsCard(
-                      title: 'Appearance',
-                      icon: Icons.palette_outlined,
-                      children: [
-                        DropdownButtonFormField<AppThemePreset>(
-                          key: ValueKey(
-                            'theme-preset-${state.themePreset.name}',
-                          ),
-                          initialValue: state.themePreset,
-                          isExpanded: true,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'Theme preset',
-                          ),
-                          items: const [
-                            DropdownMenuItem(
-                              value: AppThemePreset.system,
-                              child: Text('System theme'),
-                            ),
-                            DropdownMenuItem(
-                              value: AppThemePreset.light,
-                              child: Text('Light theme'),
-                            ),
-                            DropdownMenuItem(
-                              value: AppThemePreset.dark,
-                              child: Text('Dark theme'),
-                            ),
-                            DropdownMenuItem(
-                              value: AppThemePreset.navyBlue,
-                              child: Text('Navy blue theme'),
-                            ),
-                            DropdownMenuItem(
-                              value: AppThemePreset.charcoalGray,
-                              child: Text('Charcoal gray theme'),
-                            ),
-                          ],
-                          onChanged: (value) {
-                            if (value != null) {
-                              controller.setThemePreset(value);
-                            }
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    width: cardWidth,
-                    child: _SettingsCard(
-                      title: 'Support Development',
-                      icon: Icons.volunteer_activism_outlined,
-                      children: [
-                        const Text(
-                          'Support ongoing development of this app. Individuals and businesses can contribute to help improve features and performance.',
-                        ),
-                        const SizedBox(height: 12),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: OutlinedButton.icon(
-                            onPressed: () =>
-                                openExternalUrl(context, githubSponsorsUrl),
-                            icon: const Icon(Icons.favorite_border),
-                            label: const Text('Sponsor on GitHub'),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    width: cardWidth,
-                    child: _SettingsCard(
-                      title: 'Support',
-                      icon: Icons.support_agent_outlined,
-                      children: [
-                        const ListTile(
-                          contentPadding: EdgeInsets.zero,
-                          title: Text('Gledhill Metadata'),
-                          subtitle: Text('Version $_appVersion'),
-                        ),
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: [
-                            OutlinedButton.icon(
-                              onPressed: () =>
-                                  openExternalUrl(context, updatesUrl),
-                              icon: const Icon(
-                                Icons.system_update_alt_outlined,
-                              ),
-                              label: const Text('Check for Updates'),
-                            ),
-                            OutlinedButton.icon(
-                              onPressed: () => _copyBugReportDetails(
-                                context: context,
-                                settings: state,
-                                templateCount: templates.length,
-                                conventionCount: conventions.length,
-                                catalogError: catalog.errorMessage,
-                                photoBrowserError: photoBrowser.errorMessage,
-                                templateLibraryError:
-                                    templateLibrary.errorMessage,
-                                renameLibraryError: renameLibrary.errorMessage,
-                              ),
-                              icon: const Icon(Icons.bug_report_outlined),
-                              label: const Text('Copy Bug Details'),
-                            ),
-                            OutlinedButton.icon(
-                              onPressed: () =>
-                                  openExternalUrl(context, issuesUrl),
-                              icon: const Icon(Icons.open_in_new),
-                              label: const Text('Report Issue'),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+              if (twoColumns)
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(width: cardWidth, child: workflowAndAppearanceCard),
+                    const SizedBox(width: 16),
+                    SizedBox(width: cardWidth, child: keyboardShortcutsCard),
+                  ],
+                )
+              else ...[
+                workflowAndAppearanceCard,
+                const SizedBox(height: 16),
+                keyboardShortcutsCard,
+              ],
+              const SizedBox(height: 16),
+              if (twoColumns)
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(width: cardWidth, child: safetyCard),
+                    const SizedBox(width: 16),
+                    SizedBox(width: cardWidth, child: supportCombinedCard),
+                  ],
+                )
+              else ...[
+                safetyCard,
+                const SizedBox(height: 16),
+                supportCombinedCard,
+              ],
             ],
           );
         },

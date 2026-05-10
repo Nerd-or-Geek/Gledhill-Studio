@@ -115,6 +115,11 @@ class _TemplateManagerScreenState extends ConsumerState<TemplateManagerScreen> {
   }
 
   Future<void> _deleteTemplate(MetadataTemplate template) async {
+    // Clear default if this template is the default
+    if (ref.read(appSettingsControllerProvider).defaultTemplateId == template.id) {
+      await ref.read(appSettingsControllerProvider.notifier).setDefaultTemplateId(null);
+    }
+
     final shouldDelete = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(

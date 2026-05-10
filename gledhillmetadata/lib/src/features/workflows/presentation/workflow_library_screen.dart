@@ -206,6 +206,11 @@ class _WorkflowLibraryScreenState extends ConsumerState<WorkflowLibraryScreen> {
   }
 
   Future<void> _deleteTemplate(MetadataTemplate template) async {
+    // Clear default if this template is the default
+    if (ref.read(appSettingsControllerProvider).defaultTemplateId == template.id) {
+      await ref.read(appSettingsControllerProvider.notifier).setDefaultTemplateId(null);
+    }
+
     final confirmed = await _confirmDelete(
       'Delete template "${template.name}"?',
     );
@@ -219,6 +224,11 @@ class _WorkflowLibraryScreenState extends ConsumerState<WorkflowLibraryScreen> {
   }
 
   Future<void> _deleteConvention(RenameConvention convention) async {
+    // Clear default if this convention is the default
+    if (ref.read(appSettingsControllerProvider).defaultConventionId == convention.id) {
+      await ref.read(appSettingsControllerProvider.notifier).setDefaultConventionId(null);
+    }
+
     final confirmed = await _confirmDelete(
       'Delete rename rule "${convention.name}"?',
     );

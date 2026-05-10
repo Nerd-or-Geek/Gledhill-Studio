@@ -155,9 +155,14 @@ class TemplatesScreen extends ConsumerWidget {
                                       ),
                                       onDuplicate: () => _duplicateTemplate(context, ref, controller, template),
                                       onExport: () => _exportSingleTemplate(context, ref, template),
-                                      onDelete: () => controller
-                                          .deleteTemplate(template)
-                                          .then((_) => ref.read(libraryCatalogControllerProvider.notifier).refresh()),
+                                      onDelete: () async {
+                                        // Clear default if this template is the default
+                                        if (ref.read(appSettingsControllerProvider).defaultTemplateId == template.id) {
+                                          await ref.read(appSettingsControllerProvider.notifier).setDefaultTemplateId(null);
+                                        }
+                                        await controller.deleteTemplate(template);
+                                        await ref.read(libraryCatalogControllerProvider.notifier).refresh();
+                                      },
                                     );
                                   },
                                 ),

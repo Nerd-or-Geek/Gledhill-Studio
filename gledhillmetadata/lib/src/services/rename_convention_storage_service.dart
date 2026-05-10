@@ -23,19 +23,6 @@ class RenameConventionStorageService {
       await defaultDir.create(recursive: true);
     }
 
-    final defaultFile = File(p.join(defaultDir.path, 'Default Pattern.json'));
-    if (!await defaultFile.exists()) {
-      final initial = const RenameConvention(
-        id: 'default-pattern',
-        name: 'Default Pattern',
-        isFavorite: true,
-        pattern: '{year}-{month}-{day}_{sequence:3}_{metadata:author}',
-      );
-      await defaultFile.writeAsString(
-        const JsonEncoder.withIndent('  ').convert(initial.toJson()),
-      );
-    }
-
     return root;
   }
 
@@ -167,6 +154,11 @@ class RenameConventionStorageService {
       if (await previousFile.exists()) {
         await previousFile.delete();
       }
+    }
+
+    // Ensure no duplicate by deleting any existing file with the same name
+    if (await targetFile.exists()) {
+      await targetFile.delete();
     }
 
     await targetFile.writeAsString(

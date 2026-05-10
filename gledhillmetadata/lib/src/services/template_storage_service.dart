@@ -120,6 +120,11 @@ class TemplateStorageService {
       }
     }
 
+    // Ensure no duplicate by deleting any existing file with the same name
+    if (await targetFile.exists()) {
+      await targetFile.delete();
+    }
+
     await targetFile.writeAsString(
       const JsonEncoder.withIndent('  ').convert(template.toJson()),
     );

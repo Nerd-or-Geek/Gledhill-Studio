@@ -59,7 +59,7 @@ The Linux helper scripts now live in [linux](linux).
 
 ## Version
 
-Current release: **v1.8.0**
+Current release: **v2.0**
 
 ## 💰 Support & Commercial Use
 

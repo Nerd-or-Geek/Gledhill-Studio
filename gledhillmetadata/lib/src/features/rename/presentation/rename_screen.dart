@@ -194,6 +194,10 @@ class RenameScreen extends ConsumerWidget {
                                           ),
                                           TextButton(
                                             onPressed: () async {
+                                              // Clear default if this convention is the default
+                                              if (ref.read(appSettingsControllerProvider).defaultConventionId == convention.id) {
+                                                await ref.read(appSettingsControllerProvider.notifier).setDefaultConventionId(null);
+                                              }
                                               await controller.deleteConvention(convention);
                                               await ref
                                                   .read(libraryCatalogControllerProvider.notifier)
