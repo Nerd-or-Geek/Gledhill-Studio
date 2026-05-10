@@ -1,0 +1,4 @@
+{
+  "name": "131 Promo",
+  "pattern": "{date}-HCS-Promo-{sequence:02d}"
+}

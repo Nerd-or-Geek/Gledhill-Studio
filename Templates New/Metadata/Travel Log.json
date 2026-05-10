@@ -1,0 +1,10 @@
+{
+  "name": "Travel Log",
+  "isFavorite": false,
+  "fields": {
+    "XMP.Creator": "Travel Photographer",
+    "XMP.Description": "Travel documentation"
+  },
+  "gledhillForgeVersion": "2.0",
+  "type": "metadataTemplate"
+}

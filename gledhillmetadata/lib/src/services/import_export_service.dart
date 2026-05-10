@@ -30,7 +30,7 @@ class ImportPayload {
 }
 
 class ImportExportService {
-  static const formatVersion = '1.0';
+  static const formatVersion = '2.0';
 
   Future<String?> chooseSavePath({
     required String dialogTitle,
@@ -191,11 +191,12 @@ class ImportExportService {
   }
 
   ImportItemKind detectKind(Map<String, dynamic> json) {
-    final type = (json['type'] as String?)?.trim();
-    if (type == 'metadataTemplate') {
+    final rawType = (json['type'] as String?)?.trim().toLowerCase();
+    final type = rawType?.replaceAll(RegExp(r'[^a-z]'), '');
+    if (type == 'metadatatemplate' || type == 'template') {
       return ImportItemKind.metadataTemplate;
     }
-    if (type == 'renameConvention') {
+    if (type == 'renameconvention' || type == 'rename') {
       return ImportItemKind.renameConvention;
     }
 

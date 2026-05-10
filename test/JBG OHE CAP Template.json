@@ -1,0 +1,14 @@
+{
+  "gledhillForgeVersion": "1.0",
+  "type": "metadataTemplate",
+  "name": "JBG OHE CAP Template 2",
+  "isFavorite": true,
+  "fields": {
+    "XMP.Copyright": "Copyright - Copyright © Civil Air Patrol",
+    "XMP.Creator": "Creator - James Gledhill",
+    "XMP.Keywords": "Keywords-Civil Air Patrol, Ohio Wing, Encampment, Cadet",
+    "XMP.Description": "Description - Civil Air Patrol’s 2026 Ohio Encampment",
+    "XMP.Title": "Title - Civil Air Patrol’s 2026 Ohio Encampment",
+    "XMP.Headline": "Headline - Headline stuff is in here"
+  }
+}

@@ -1,0 +1,4 @@
+{
+  "name": "131 Event",
+  "pattern": "{date}_Event_{sequence:02d}"
+}

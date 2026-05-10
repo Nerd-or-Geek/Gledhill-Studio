@@ -1,0 +1,5 @@
+{
+  "name": "Timestamp + Camera",
+  "isFavorite": false,
+  "pattern": "{datetime:%Y%m%d_%H%M%S}_{camera_model}"
+}
